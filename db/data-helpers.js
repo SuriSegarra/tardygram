@@ -4,20 +4,31 @@ const connect = require('../lib/utils/connect');
 const seed = require('../db/seed');
 const mongoose = require('mongoose');
 const fs = require('fs');
+const request = require('supertest');
+const app = require('../lib/app');
 
-//data-helpers hekp us to test.  let us run tests without having to make up a fake actor/film/whatever first before every test.
 beforeAll(() => {
   connect();
 });
-  
+
 beforeEach(() => {
   return mongoose.connection.dropDatabase();
 });
-  
+
 beforeEach(() => {
   return seed();
 });
-  
+
+const agent = request.agent(app);
+beforeEach(() => {
+  return agent
+    .post('/api/v1/auth/login')
+    .send({
+      email: 'suri',
+      password: 'suriWasHere'
+    });
+});
+
 afterAll(() => {
   return mongoose.connection.close();
 });
@@ -36,9 +47,12 @@ const getters = files
   .reduce((acc, Model) => {
     return {
       ...acc,
-      [`get${Model.modelName}`]: query => Model.findOne(query).then(prepare),
-      [`get${Model.modelName}s`]: query => Model.find(query).then(prepareAll)
+      [`get${Model.modelName}`]: (query, select) => Model.findOne(query).select(select).then(prepare),
+      [`get${Model.modelName}s`]: (query, select) => Model.find(query).select(select).then(prepareAll)
     };
   }, {});
 
-module.exports = getters;
+module.exports = {
+  ...getters,
+  getAgent: () => agent
+};
