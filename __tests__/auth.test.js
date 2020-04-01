@@ -1,4 +1,4 @@
-require('../db/data-helpers');
+const { getAgent } = require('../db/data-helpers');
 const request = require('supertest');
 const app = require('../lib/app');
 
@@ -22,6 +22,7 @@ describe('auth routes', () => {
       });
   });
   it('logs in a user', async() => {
+    
     return request(app)
       .post('/api/v1/auth/login')
       .send({
@@ -38,17 +39,15 @@ describe('auth routes', () => {
         });
       });
   });
-  it('fails to login a user with a bad password', async() => {
-    return request(app)
-      .post('/api/v1/auth/login')
-      .send({
-        username: 'suri',
-        password: 'suriWasHere'
-      })
+  it('verifies a logged in user', () => {
+    return getAgent()
+      .get('/api/v1/auth/verify')
       .then(res => {
         expect(res.body).toEqual({
-          message: 'Invalid username/ password',
-          status: 403
+          _id: expect.any(String),
+          username: 'suri',
+          profilePhotoUrl: expect.any(String),
+          __v: 0
         });
       });
   });
