@@ -1,4 +1,4 @@
-const { getAgent, getUser, getPost } = require('../db/data-helpers'
+const { getAgent, getUser, getPost, getComments } = require('../db/data-helpers'
 );
 
 describe('post routes', () => {
@@ -26,4 +26,18 @@ describe('post routes', () => {
         });
       });
   });
+  it('gets post by id', async() => {
+    const user = await getUser({ username: 'suri'});
+    const post = await getPost({ user: user._id });
+
+    return getAgent()
+      .get(`/api/v1/posts/${post._id}`)
+      .then(res => {
+        expect(res.body).toEqual({
+          ...post,
+          user,
+        });
+      });
+  });
+
 });
