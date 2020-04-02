@@ -39,6 +39,7 @@ describe('post routes', () => {
         });
       });
   });
+
   it('gets all posts', async() => {
     const user = await getUser({ username: 'suri' });
     const posts = await getPosts({ user: user._id });
