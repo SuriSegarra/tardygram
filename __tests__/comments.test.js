@@ -22,4 +22,12 @@ describe('comments route', () => {
         });
       });
   });
+  it('deletes a comment by id', async() => {
+    const comment = await getComment();
+    return getAgent()
+      .delete(`/api/v1/comments/${comment._id}`)
+      .then(res => {
+        expect(res.body).toEqual(comment);
+      });
+  });
 });
