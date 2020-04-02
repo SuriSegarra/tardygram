@@ -60,6 +60,16 @@ describe('post routes', () => {
           caption: expect.any(String)
         });
       });
+  });
+  it('deletes a post', async() => {
+    const user = await getUser({ username: 'suri' });
+    const post = await getPost({ user: user._id });
 
+    return getAgent()
+      .delete(`/api/v1/posts/${post._id}`)
+      .then(res => {
+        expect(res.body).toEqual(post);
+      });
   });
 });
+
